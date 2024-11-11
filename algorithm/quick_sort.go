@@ -41,7 +41,7 @@ func quickSort(array []int, low int, high int) {
 	quickSort(array, i+1, high)
 }
 
-func sort(array []int, length int) {
+func qsort(array []int, length int) {
 	if length > 0 {
 		quickSort(array, 0, length-1)
 	}
@@ -51,7 +51,7 @@ func main() {
 	var scores = []int{50, 33, 99, 82, 73, 100, 2, 93}
 	var length = len(scores)
 
-	sort(scores, length)
+	qsort(scores, length)
 
 	for i := 0; i < length; i++ {
 		if i == length-1 {
