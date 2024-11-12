@@ -11,7 +11,7 @@ type Node struct {
 }
 
 var head *Node = nil
-var tail = new(Node)
+var tail *Node = nil
 var size int
 
 // キューに要素を追加する
@@ -24,7 +24,7 @@ func offer(element string) {
 		var newNode = new(Node)
 		newNode.data = element
 		newNode.prev = tail
-		tail.prev = newNode
+		tail.next = newNode
 		tail = newNode
 	}
 	size++
@@ -32,13 +32,18 @@ func offer(element string) {
 
 // キューから要素を取り出す
 func poll() *Node {
-	var p = head
-
-	if p == nil {
+	if head == nil {
 		return nil
 	}
 
-	head = head.prev
+	var p = head
+	head = head.next
+
+	if head == nil {
+		tail = nil
+	} else {
+		head.prev = nil
+	}
 
 	// 取り出したNodeの前後関係は不要なので削除
 	p.next = nil
@@ -49,7 +54,7 @@ func poll() *Node {
 }
 
 func output() {
-	fmt.Printf("Head ")
+	fmt.Printf("Head<-")
 	var node *Node = nil
 	for {
 		node = poll()
@@ -69,3 +74,5 @@ func main() {
 
 	output()
 }
+
+// => Head<-A<-B<-C<-D<-Tail
