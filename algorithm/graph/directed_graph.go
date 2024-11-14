@@ -17,12 +17,17 @@ var top = -1
 var stacks = make([]int, StackSize)
 
 func push(element int) {
+	if top >= MaxVertexSize-1 {
+		fmt.Printf("Stack size exceeds MaxVertexSize (%d)\n", MaxVertexSize)
+		return
+	}
+
 	top++
 	stacks[top] = element
 }
 
 func pop() int {
-	if top == -1 {
+	if isEmpty() {
 		return -1
 	}
 	var data = stacks[top]
@@ -31,17 +36,14 @@ func pop() int {
 }
 
 func peek() int {
-	if top == -1 {
+	if isEmpty() {
 		return -1
 	}
 	return stacks[top]
 }
 
 func isEmpty() bool {
-	if top == -1 {
-		return true
-	}
-	return false
+	return top == -1
 }
 
 var size = 0
@@ -51,33 +53,42 @@ var vertices = make([]*Vertex, MaxVertexSize)
 var adjacencyMatrix [MaxVertexSize][MaxVertexSize]int
 
 func addVertex(data string) {
-	var vertex Vertex
-	vertex.data = data
-	vertex.visited = false
-	vertices[size] = &vertex
+	if size >= MaxVertexSize {
+		fmt.Println("Reached MaxVertexSize")
+		return
+	}
+	vertex := &Vertex{data: data, visited: false}
+	vertices[size] = vertex
 	size++
 }
 
 func addEdge(from int, to int) {
+	if from < 0 || from >= size || to < 0 || to >= size {
+		fmt.Println("Invalid edge index")
+		return
+	}
 	adjacencyMatrix[from][to] = 1
 }
 
-func clear() {
+func clearVisited() {
 	for i := 0; i < size; i++ {
 		vertices[i].visited = false
 	}
 }
 
-func depthFirstSearch() {
-	vertices[0].visited = true
+func depthFirstSearch(start int) {
+	if start < 0 || start >= size {
+		fmt.Println("Invalid start vertex")
+		return
+	}
+
+	vertices[start].visited = true
 	fmt.Printf("%s", vertices[0].data)
-	push(0)
-	for {
-		if isEmpty() {
-			break
-		}
-		var row = peek()
-		var column = findAdjacencyUnVisitedVertex(row)
+	push(start)
+
+	for !isEmpty() {
+		row := peek()
+		column := findAdjacencyUnVisitedVertex(row)
 		if column == -1 {
 			pop()
 		} else {
@@ -86,8 +97,8 @@ func depthFirstSearch() {
 			push(column)
 		}
 	}
-	fmt.Printf("\n")
-	clear()
+	fmt.Println()
+	clearVisited()
 }
 
 func findAdjacencyUnVisitedVertex(row int) int {
@@ -100,18 +111,20 @@ func findAdjacencyUnVisitedVertex(row int) int {
 }
 
 func printGraph() {
-	fmt.Printf("Two-demensional array travesal vertex edge and adjacent array : \n ")
-	for i := 0; i < MaxVertexSize; i++ {
-		fmt.Printf("%s", vertices[i].data)
-	}
-	fmt.Printf("\n")
+	fmt.Println("Adjacency Matrix:")
+	fmt.Print("  ")
 
-	for i := 0; i < MaxVertexSize; i++ {
-		fmt.Printf("%s", vertices[i].data)
-		for j := 0; j < MaxVertexSize; j++ {
-			fmt.Printf("%d", adjacencyMatrix[i][j])
+	for i := 0; i < size; i++ {
+		fmt.Printf("%s ", vertices[i].data)
+	}
+	fmt.Println()
+
+	for i := 0; i < size; i++ {
+		fmt.Printf("%s ", vertices[i].data)
+		for j := 0; j < size; j++ {
+			fmt.Printf("%d ", adjacencyMatrix[i][j])
 		}
-		fmt.Printf("\n")
+		fmt.Println()
 	}
 }
 
@@ -131,6 +144,18 @@ func main() {
 	addEdge(3, 4)
 
 	printGraph()
-	fmt.Printf("\nDepth-first search traversal output : \n")
-	depthFirstSearch()
+	fmt.Println("\nDepth-first search traversal output:")
+	depthFirstSearch(0)
 }
+
+// =>
+// Adjacency Matrix:
+//   A B C D E
+// A 0 1 1 1 0
+// B 0 0 1 1 0
+// C 0 0 0 1 0
+// D 0 0 0 0 1
+// E 0 0 0 0 0
+//
+// Depth-first search traversal output:
+// A->B->C->D->E
