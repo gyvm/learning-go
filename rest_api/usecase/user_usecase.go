@@ -23,7 +23,7 @@ func NewUserUsecase(ur repository.IUserRepository) IUserUsecase {
 }
 
 func (uu *userUsecase) SignUp(user model.User) (model.UserResponse, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
 		return model.UserResponse{}, err
 	}
